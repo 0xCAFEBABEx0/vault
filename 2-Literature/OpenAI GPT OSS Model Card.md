@@ -23,6 +23,10 @@ tags:
   - keyword/tool-use
 ---
 
+## Abstract / Summary
+OpenAI’s gpt-oss model card documents gpt-oss-120b and gpt-oss-20b, two Apache-2.0 open-weight reasoning models designed for agentic workflows, tool use, structured outputs, and configurable reasoning effort. It summarizes architecture, tokenizer, training, post-training, evaluations, quantization, safety testing, and preparedness findings. The card emphasizes the different risk profile of open models, including downstream fine-tuning risk and the need for system-level safeguards by deployers.
+
+
 # gpt-oss-120b & gpt-oss-20b Model Card
 
 OpenAI  

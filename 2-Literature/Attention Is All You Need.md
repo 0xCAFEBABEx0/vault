@@ -23,6 +23,10 @@ tags:
   - keyword/sequence-modeling
   - keyword/nlp
 ---
+
+## Abstract / Summary
+The Transformer replaces recurrent and convolutional sequence transduction architectures with a model based entirely on attention mechanisms. The paper shows that self-attention enables more parallelizable training while improving machine translation quality, achieving strong BLEU results on WMT 2014 English-German and English-French tasks. Its architecture became the foundation for modern large language models and much of contemporary GenAI.
+
 arXiv:1706.03762v7 \[cs.CL\] 02 Aug 2023
 
 Provided proper attribution is provided, Google hereby grants permission to reproduce the tables and figures in this paper solely for use in journalistic or scholarly works.

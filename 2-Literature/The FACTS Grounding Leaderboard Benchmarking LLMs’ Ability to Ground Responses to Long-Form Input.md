@@ -27,6 +27,10 @@ tags:
   - keyword/context-awareness
   - keyword/text-generation
 ---
+
+## Abstract / Summary
+FACTS Grounding introduces a benchmark and leaderboard for evaluating whether LLM responses are factually grounded in long-form input documents. Prompts include a user request plus up to 32k tokens of context, and responses are judged in two stages: first for request fulfillment, then for full support by the provided document. The benchmark uses validated automated judge models and public/private splits to support ongoing evaluation while reducing leaderboard gaming.
+
 arXiv:2501.03200v1 \[cs.CL\] 06 Jan 2025
 
 facts-leaderboard@google.com

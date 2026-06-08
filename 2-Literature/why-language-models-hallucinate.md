@@ -14,6 +14,10 @@ tags:
   - keyword/evaluation
   - source/pdf
 ---
+
+## Abstract / Summary
+The paper argues that language-model hallucinations arise from statistical pressures in pretraining and persist because common evaluations reward guessing over admitting uncertainty. It frames hallucination as a form of plausible generative error related to binary classification mistakes, then explains why benchmark scoring can incentivize overconfident answers. The proposed mitigation is socio-technical: adjust dominant benchmark scoring so calibrated uncertainty is not punished.
+
 Why Language Models Hallucinate
 
 Adam Tauman Kalai∗
