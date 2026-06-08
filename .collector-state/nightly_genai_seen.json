@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-09T05:02:10.626589+09:00",
+  "updated": "2026-06-09T07:01:38.895686+09:00",
   "seen": [
     "Assets/why-language-models-hallucinate.pdf",
     "Clippings/oai_gpt-oss_model_card.pdf",
@@ -13,11 +13,15 @@
     "arxiv:2410.10814",
     "arxiv:2410.14635",
     "arxiv:2412.09871",
+    "arxiv:2412.11695",
+    "arxiv:2412.17540",
     "arxiv:2501.03200",
+    "arxiv:2502.01108",
     "arxiv:2502.20578",
     "arxiv:2503.17547",
     "arxiv:2504.01916",
     "arxiv:2505.05071",
+    "arxiv:2506.09108",
     "arxiv:2507.22264",
     "arxiv:2508.14292",
     "arxiv:2509.09396",
@@ -27,6 +31,8 @@
     "arxiv:2602.04127",
     "arxiv:2604.24665",
     "arxiv:2605.00674",
+    "arxiv:2606.07172",
+    "arxiv:2606.07235",
     "arxiv:2606.07289",
     "arxiv:2606.07365",
     "arxiv:2606.07383",
@@ -44,6 +50,8 @@
     "https://arxiv.org/html/1706.03762v7",
     "https://arxiv.org/html/2412.09871v1",
     "https://arxiv.org/html/2501.03200v1",
+    "https://arxiv.org/html/2606.07172v1",
+    "https://arxiv.org/html/2606.07235v1",
     "https://arxiv.org/html/2606.07289v1",
     "https://arxiv.org/html/2606.07365v1",
     "https://arxiv.org/html/2606.07383v1",
@@ -65,6 +73,7 @@
     "https://huggingface.co/blog/hf-cli-for-agents",
     "https://huggingface.co/blog/nvidia/nemotron-3-5-content-safety",
     "https://huggingface.co/blog/openenv-agentic-rl",
+    "https://openai.com/index/built-to-benefit-everyone-our-plan",
     "https://openai.com/index/endava-frontiers"
   ]
 }
