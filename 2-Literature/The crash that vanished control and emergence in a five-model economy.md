@@ -4,7 +4,7 @@ source: "https://huggingface.co/blog/build-small-hackathon/thousand-token-wood-s
 author: "Hugging Face Blog"
 published: "2026-06-08"
 created: 2026-06-09
-description: ""
+description: "Agent-based market simulation note: a previously observed emergent honey crash vanished after switching to a heterogeneous five-model economy, showing that emergence can be contingent on model disposition."
 tags:
   - type/literature
   - theme/research
@@ -20,7 +20,7 @@ tags:
 - published:: 2026-06-08
 
 ## Abstract / Summary
-(No summary provided by source feed.)
+The article describes a rebuild of the Thousand Token Wood agent-based market simulation from one model controlling multiple creatures into a heterogeneous five-model economy. A previously observed emergent honey market crash disappeared after the model population changed: agents interpreted the panic signal as scarcity and hoarded honey instead of selling it. The key lesson is that emergent behavior in multi-agent economies can be contingent on specific model dispositions, so reliable narrative or economic outcomes require explicit control at the right system seam rather than assuming emergence will repeat.
 
 ## Why it matters for GenAI tracking
 - Captured automatically as part of the nightly generative-AI research and technical-blog watchlist.

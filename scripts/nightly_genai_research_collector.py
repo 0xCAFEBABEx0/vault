@@ -231,6 +231,52 @@ def parse_feed_date(entry: ET.Element, ns: dict) -> str:
     return ""
 
 
+def extract_html_summary(url: str, limit: int = 1200) -> str:
+    """Fetch a page and extract a concise non-LLM summary fallback.
+
+    RSS feeds, especially Hugging Face's, sometimes omit summaries entirely.
+    Prefer explicit meta descriptions; fall back to the first substantial
+    paragraphs so we do not create empty literature notes.
+    """
+    try:
+        raw = http_get(url, timeout=20).decode("utf-8", errors="ignore")
+    except Exception as e:
+        print(f"WARN page summary fetch failed for {url}: {e}", file=sys.stderr)
+        return ""
+
+    paragraphs = re.findall(r"<p[^>]*>(.*?)</p>", raw, re.I | re.S)
+    useful: list[str] = []
+    for para in paragraphs:
+        text = clean_text(para, 500)
+        lower = text.lower()
+        if len(text) < 80:
+            continue
+        if text.startswith("Models Datasets Spaces"):
+            continue
+        if any(skip in lower for skip in ["subscribe", "cookie", "privacy policy", "terms of service", "more articles from our blog"]):
+            continue
+        useful.append(text)
+        if sum(len(x) for x in useful) >= limit:
+            break
+    paragraph_summary = clean_text(" ".join(useful), limit)
+    if len(paragraph_summary) >= 80:
+        return paragraph_summary
+
+    meta_patterns = [
+        r'<meta[^>]+property=["\']og:description["\'][^>]+content=["\']([^"\']+)["\']',
+        r'<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']+)["\']',
+        r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:description["\']',
+        r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+name=["\']description["\']',
+    ]
+    for pat in meta_patterns:
+        m = re.search(pat, raw, re.I | re.S)
+        if m:
+            text = clean_text(m.group(1), limit)
+            if len(text) >= 80 and "advance and democratize artificial intelligence" not in text.lower():
+                return text
+    return ""
+
+
 def rss_items(max_total: int) -> list[Item]:
     out: list[Item] = []
     for feed in TECH_BLOG_FEEDS:
@@ -262,8 +308,10 @@ def rss_items(max_total: int) -> list[Item]:
                         link = href; break
                 desc = clean_text(e.findtext("a:summary", namespaces={"a": "http://www.w3.org/2005/Atom"}) or e.findtext("summary") or e.findtext("a:content", namespaces={"a": "http://www.w3.org/2005/Atom"}), 1200)
                 pub = parse_feed_date(e, {"a": "http://www.w3.org/2005/Atom"})
+            if title and link and not desc:
+                desc = extract_html_summary(link, limit=1200)
             lower = (title + " " + desc).lower()
-            if not title or not link or not any(k in lower for k in BLOG_KEYWORDS):
+            if not title or not link or not desc or not any(k in lower for k in BLOG_KEYWORDS):
                 continue
             out.append(Item(
                 kind="blog", title=title, source=link, authors=feed["name"], published=pub,
