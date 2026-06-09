@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-10T05:02:21.216247+09:00",
+  "updated": "2026-06-10T07:02:13.083141+09:00",
   "seen": [
     "Assets/why-language-models-hallucinate.pdf",
     "Clippings/oai_gpt-oss_model_card.pdf",
@@ -119,9 +119,11 @@
     "https://developer.nvidia.com/blog/model-quantization-turn-fp8-checkpoints-into-high-performance-inference-engines-with-nvidia-tensorrt/",
     "https://developer.nvidia.com/blog/nvidia-nemotron-3-ultra-powers-faster-more-efficient-reasoning-for-long-running-agents/",
     "https://developer.nvidia.com/blog/train-models-faster-with-jax-and-maxtext-using-nvfp4-on-nvidia-blackwell/",
+    "https://huggingface.co/blog/CohereLabs/introducing-north-mini-code",
     "https://huggingface.co/blog/ServiceNow-AI/code-switching",
     "https://huggingface.co/blog/ServiceNow-AI/eva-bench-data",
     "https://huggingface.co/blog/build-small-hackathon/thousand-token-wood-sim-v3",
+    "https://huggingface.co/blog/github-ci-hf-jobs",
     "https://huggingface.co/blog/hf-cli-for-agents",
     "https://huggingface.co/blog/mishig/spaces-agents-md",
     "https://huggingface.co/blog/nvidia/nemotron-3-5-content-safety",
