@@ -44,11 +44,32 @@ ARXIV_QUERIES = [
 TECH_BLOG_FEEDS = [
     {"name": "OpenAI News", "feed": "https://openai.com/news/rss.xml", "home": "https://openai.com/news/", "source_tag": "source/openai"},
     {"name": "Google DeepMind Blog", "feed": "https://deepmind.google/blog/rss.xml", "home": "https://deepmind.google/blog/", "source_tag": "source/deepmind"},
-    # Anthropic and Meta AI currently do not expose stable official RSS endpoints here;
-    # do not keep dead URLs in the nightly path.
+    # Meta AI does not currently expose a stable official RSS endpoint here.
     {"name": "Microsoft Research Blog", "feed": "https://www.microsoft.com/en-us/research/feed/", "home": "https://www.microsoft.com/en-us/research/blog/", "source_tag": "source/microsoft"},
     {"name": "Hugging Face Blog", "feed": "https://huggingface.co/blog/feed.xml", "home": "https://huggingface.co/blog", "source_tag": "source/huggingface"},
     {"name": "NVIDIA Technical Blog", "feed": "https://developer.nvidia.com/blog/feed/", "home": "https://developer.nvidia.com/blog/", "source_tag": "source/nvidia"},
+]
+
+# Some official blogs do not expose stable RSS/Atom endpoints.
+# For those, crawl a known sitemap and parse the latest blog pages directly.
+SITEMAP_BLOG_TARGETS = [
+    {
+        "name": "Anthropic / Claude Blog",
+        "sitemap": "https://claude.com/sitemap.xml",
+        "home": "https://claude.com/blog/",
+        "prefix": "https://claude.com/blog/",
+        "skip_prefixes": [
+            "https://claude.com/blog/category/",
+        ],
+        "skip_locale_prefixes": [
+            "https://claude.com/ja/",
+            "https://claude.com/de/",
+            "https://claude.com/fr/",
+            "https://claude.com/ko/",
+        ],
+        "source_tag": "source/anthropic",
+        "max_candidates": 60,
+    },
 ]
 
 BLOG_KEYWORDS = [
@@ -98,7 +119,7 @@ def clean_text(s: str | None, limit: int | None = None) -> str:
 
 
 def slugify(title: str, max_len: int = 88) -> str:
-    s = title.strip().replace("’", "").replace("'", "")
+    s = title.strip().replace("\u2019", "").replace("'", "")
     s = re.sub(r"[\\/:*?\"<>|#\[\]{}]", " ", s)
     s = re.sub(r"\s+", " ", s).strip(" .")
     if not s:
@@ -221,6 +242,78 @@ def semantic_related(arxiv_id: str, limit: int = 5) -> list[dict]:
             "citations": p.get("citationCount") or 0,
         })
     return out
+
+
+def fetch_page_title(url: str) -> str:
+    try:
+        raw = http_get(url, timeout=25).decode("utf-8", errors="ignore")
+    except Exception:
+        return ""
+    m = re.search(r"<title[^>]*>(.*?)</title>", raw, re.I | re.S)
+    return clean_text(m.group(1)) if m else ""
+
+
+def fetch_blog_sitemap_targets(target: dict) -> list[Item]:
+    """Parse a sitemap XML to recover recent English blog URLs for RSS-less blogs.
+
+    Because sitemap entries do not expose publication dates reliably, this function
+    enriches each candidate page with a live `<title>` fetch so downstream keyword
+    filtering works better than raw URL slug heuristics.
+    """
+    try:
+        data = http_get(target["sitemap"], timeout=30)
+    except Exception as exc:
+        print(f"WARN sitemap fetch failed for {target['name']}: {exc}", file=sys.stderr)
+        return []
+
+    try:
+        root = ET.fromstring(data)
+    except Exception as exc:
+        print(f"WARN sitemap parse failed for {target['name']}: {exc}", file=sys.stderr)
+        return []
+
+    ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+
+    raw_urls: list[str] = []
+    for loc in root.findall(".//sm:url/sm:loc", ns):
+        text = (loc.text or "").strip()
+        if text:
+            raw_urls.append(text)
+    if not raw_urls:
+        for loc in root.findall(".//loc"):
+            text = (loc.text or "").strip()
+            if text:
+                raw_urls.append(text)
+
+    items: list[Item] = []
+    seen: set[str] = set()
+
+    for url in raw_urls:
+        if not url.startswith(target["prefix"]):
+            continue
+        if any(url.startswith(p) for p in target.get("skip_locale_prefixes", [])):
+            continue
+        if any(url.startswith(p) for p in target.get("skip_prefixes", [])):
+            continue
+        if url in seen:
+            continue
+        seen.add(url)
+        title = fetch_page_title(url)
+        if not title:
+            title = url.rsplit("/", 1)[-1].replace("-", " ").strip().title()
+        items.append(
+            Item(
+                kind="blog",
+                title=title,
+                source=url,
+                source_name=target["name"],
+                source_tag=target["source_tag"],
+            )
+        )
+        if len(items) >= target.get("max_candidates", 40):
+            break
+
+    return items
 
 
 def parse_feed_date(entry: ET.Element, ns: dict) -> str:
@@ -455,11 +548,11 @@ def git(*args: str, check: bool = True) -> subprocess.CompletedProcess:
 
 def ensure_git_identity() -> None:
     name = git("config", "user.name", check=False).stdout.strip()
-    email = git("config", "user.email", check=False).stdout.strip()
+    email_addr = git("config", "user.email", check=False).stdout.strip()
     if not name:
         git("config", "user.name", "Lazy Hermes")
-    if not email:
-        git("config", "user.email", "lazy-hermes@users.noreply.github.com")
+    if not email_addr:
+        git("config", "user.email", "[EMAIL]")
 
 
 def commit_and_push(files: list[Path], push: bool) -> None:
@@ -494,8 +587,27 @@ def main() -> int:
     candidates.extend(arxiv_search(max_per_query=max(3, args.max_papers)))
     candidates.extend(rss_items(max_total=args.max_blogs))
 
-    new_files: list[Path] = []
     written_by_kind = {"paper": 0, "blog": 0}
+    for target in SITEMAP_BLOG_TARGETS:
+        target_items = fetch_blog_sitemap_targets(target)
+        added = 0
+        for item in target_items:
+            if written_by_kind.get("blog", 0) >= args.max_blogs:
+                break
+            lower = (item.title + " " + item.source).lower()
+            if not any(k in lower for k in BLOG_KEYWORDS):
+                continue
+            if item.source in seen:
+                continue
+            summary = extract_html_summary(item.source, 1200)
+            if not any(k in summary.lower() for k in BLOG_KEYWORDS[:12]):
+                continue
+            item.summary = summary
+            candidates.append(item)
+            added += 1
+        print(f"INFO {target['name']}: considered {len(target_items)} sitemap URLs, accepted {added}", file=sys.stderr)
+
+    new_files: list[Path] = []
     limits = {"paper": args.max_papers, "blog": args.max_blogs}
     for item in candidates:
         if written_by_kind.get(item.kind, 0) >= limits.get(item.kind, 0):
