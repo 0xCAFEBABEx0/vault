@@ -1,0 +1,45 @@
+---
+title: "Reading or Remembering? Measuring Temporal Contamination in Language Models"
+source: "https://arxiv.org/html/2611.21554v1"
+author: "Arunkumar V, Gangadharan G. R., S. Senthilkumar"
+published: "2026-11-16"
+created: 2026-11-18
+description: "Language models are now used to read central-bank text for economic forecasting, but most were trained on text written after the documents they read. A model reading a 2021 FOMC statement may already know that inflation rose in 2022, so part of its apparent skill can be memory of the outcome, a temporal form of test-set contamination. We measure this memory on FOMC statements and minutes from 2000 to 2026 by compari…"
+tags:
+  - type/literature
+  - theme/research
+  - theme/learning
+  - source/arxiv
+  - keyword/language-model
+  - keyword/nlp
+  - keyword/machine-learning
+---
+
+# Reading or Remembering? Measuring Temporal Contamination in Language Models
+
+## Source Metadata
+- type:: paper
+- source:: [arXiv](https://arxiv.org/html/2611.21554v1)
+- published:: 2026-11-16
+- updated:: 2026-11-16
+- arxiv_id:: 2611.21554v1
+- pdf:: https://arxiv.org/pdf/2611.21554v1
+- categories:: cs.LG, cs.CL
+
+## Abstract / Summary
+Language models are now used to read central-bank text for economic forecasting, but most were trained on text written after the documents they read. A model reading a 2021 FOMC statement may already know that inflation rose in 2022, so part of its apparent skill can be memory of the outcome, a temporal form of test-set contamination. We measure this memory on FOMC statements and minutes from 2000 to 2026 by comparing modern open models with chronologically consistent models, which are trained only on text from before a fixed date. Asked about past GDP outcomes given only a date, models that cannot know the answer still reach an AUC of up to 0.64 from priors on dates and eras, so chance is the wrong baseline. Against these memory-free models on the same questions, most modern models recall which years had strong growth. Membership-inference scores sort documents by era and document type rather than by whether a model saw them, as exact counts in an open pretraining corpus show. In real-time nowcasts, every lookahead premium we estimate on US GDP is smaller than the forecast comparison can detect at macroeconomic sample sizes, and none on GDP or inflation survives correction for multiple testing. Lookahead audits should therefore measure memory directly against memory-free models on the same items.
+
+## Why it matters for GenAI tracking
+- Captured automatically as part of the nightly generative-AI research and technical-blog watchlist.
+- Review manually before promoting any idea to `3_Permanent` notes.
+
+## Related Materials
+- [arXiv abstract](https://arxiv.org/abs/2611.21554v1)
+- [PDF](https://arxiv.org/pdf/2611.21554v1)
+
+## Follow-up Questions
+- question:: Should this be converted into a permanent insight note?
+- question:: Are there implementation details, benchmarks, or released code worth tracking separately?
+
+---
+Tags: #type/literature #theme/research #theme/learning #source/arxiv #keyword/language-model #keyword/nlp #keyword/machine-learning
